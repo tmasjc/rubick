@@ -3,7 +3,8 @@ library(DBI)
 library(dbplyr)
 library(config)
 
-cnf <- config::get()
+# global parameters, including username and password
+glo <- config::get()
 
 est_conn <- function(g, l) {
     # g for global, x for local
@@ -17,26 +18,34 @@ est_conn <- function(g, l) {
     )
 }
 
-# which config to load
-wic <- config::get(config = cnf[["d1"]])
+# which specfic config to load (local)
+loc <- config::get(config = glo[["example1"]])
 
 # establish connection to db
-conn <- est_conn(cnf, wic)
+conn <- est_conn(glo, loc)
 
-query <- read_file(str_glue("{ cnf$src }/{ wic$file }"))
+# determines which SQL file
+query <- read_file(str_glue("{ glo$src }/{ loc$file }"))
+SQL(query)
 
-x1 = "date_start"; x2 = "date_end";
+# parse variables from SQL
+vars <- query %>%
+    str_extract_all(pattern = "\\?\\w+", simplify = TRUE) %>%
+    map_chr( ~ str_remove(., pattern = "^\\?"))
 
 # bind variables to interpolate func to form complete query string
 # unevaluated expression
 meta <- 
-    str_glue("sqlInterpolate(conn = conn, \\
+    str_glue(
+        "sqlInterpolate(conn = conn, \\
              sql = query, \\
-             {x1} = Sys.Date() - 7, \\
-             {x2} = Sys.Date() - 1)")
+             {vars[1]} = Sys.Date() - 7, \\
+             {vars[2]} = Sys.Date() - 1)"
+    )
 
+# evaluate now
 q <- eval(parse(text = meta))
 
-DBI::dbGetQuery(conn, q)
+DBI::dbGetQuery(conn, q) %>% head()
 
 DBI::dbDisconnect(conn)
