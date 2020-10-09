@@ -9,6 +9,10 @@ library(DT)
 
 ui <- fluidPage(
     
+    tags$head(
+        tags$link(rel = "stylesheet", type = "text/css", href = "custom.css")
+    ),
+    
     titlePanel("R U B I C K"),
     tags$hr(),
     theme = shinytheme("yeti"),
@@ -17,7 +21,7 @@ ui <- fluidPage(
         sidebarPanel(
             selectizeInput(
                 inputId = "form",
-                label   = tags$h4("Forms"),
+                label   = tags$h4("可选项"),
                 choices = "",
                 width   = "100%"
             ),
@@ -28,13 +32,16 @@ ui <- fluidPage(
                 icon    = icon("circle-notch"),
                 width   = "100%"
             ), 
-            width = 2
+            width = 3
         ),
         mainPanel(
+            tags$h4("Query"),
             verbatimTextOutput("print_query"),
+            tags$h4("Result"),
             dataTableOutput("tbl"), 
             width = 8
-        )
+        ), 
+        position = "right"
     )
 )
 
@@ -163,6 +170,7 @@ server <- function(input, output, session) {
         datatable(
             head(res(), 20),
             options   = list(dom = 'tip'), 
+            class     = 'cell-border stripe',
             rownames  = FALSE
         )
         
