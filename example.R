@@ -19,7 +19,7 @@ est_conn <- function(g, l) {
 }
 
 # which specfic config to load (local)
-loc <- config::get(config = glo[["example1"]])
+loc <- config::get(config = glo[["form1"]])
 
 # establish connection to db
 conn <- est_conn(glo, loc)
