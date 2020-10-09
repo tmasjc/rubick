@@ -1,29 +1,29 @@
 library(tidyverse)
 library(shiny)
 library(shinythemes)
+library(DBI)
 library(dbplyr)
 library(config)
+library(rlang)
 
 ui <- fluidPage(
     
     titlePanel("R U B I C K"),
-    theme = shinytheme("spacelab"),
+    tags$hr(),
+    theme = shinytheme("yeti"),
     
-    sidebarLayout(
-        
-        sidebarPanel(
-            selectizeInput(
-                inputId = "form",
-                label   = "Forms",
-                choices = "",
-                width   = "80%"
-            ),
-            uiOutput("variables")
+    column(
+        width  = 4,
+        offset = 4,
+        selectizeInput(
+            inputId = "form",
+            label   = tags$h4("Forms"),
+            choices = "",
+            width   = "40%"
         ),
-        
-        mainPanel(
-            
-        )
+        uiOutput("variables"),
+        verbatimTextOutput("print_query")
+        # actionButton("go", label = "GO", icon = icon("circle-notch"))
     )
 )
 
@@ -33,33 +33,48 @@ parse_forms <- function(l) {
     unlist(l[ind], use.names = FALSE)
 }
 
+est_conn <- function(g, l, driver) {
+    # g for global, x for local
+    DBI::dbConnect(
+        drv      = driver,
+        user     = g[["username"]],
+        password = g[["password"]],
+        host     = l[["db_host"]],
+        port     = l[["db_port"]],
+        dbname   = l[["db_name"]]
+    )
+}
+
 server <- function(input, output, session) {
     
     # read global setting here
     globe <- config::get()
-    forms <- parse_forms(globe)
     
     # update forms 
+    forms <- parse_forms(globe)
     updateSelectizeInput(session, "form", choices = forms, selected = "")
     
-    # render variables from chosen config
-    output$variables <- renderUI({
-        
-        req(input$form)
+    query <- reactive({
         
         # when user selects, read SQL file accordingly
         loc   <- config::get(config = tolower(input$form))
         
-        query <- tryCatch(
+        tryCatch(
             read_file(str_glue("{ globe$src }/{ loc$file }")),
             # in case file not found
             error = function(e) {
                 return("")
             }
         )
+    })
+    
+    # render variables from chosen config
+    output$variables <- renderUI({
+        
+        req(input$form)
         
         # extract variables here
-        vars  <- query %>%
+        vars  <- query() %>%
             str_extract_all("\\?\\w+", simplify = TRUE) %>%
             map_chr(~ str_remove(., "\\?"))
         
@@ -68,6 +83,13 @@ server <- function(input, output, session) {
         tagList(map(exprs, ~ eval(parse_expr(.x))))
         
     })
+    
+    # preview query
+    output$print_query <- renderText({
+        query()
+    })
+    
+    
 }
 
 shinyApp(ui, server)
