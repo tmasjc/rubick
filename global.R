@@ -7,6 +7,7 @@ library(dbplyr)
 library(config)
 library(rlang)
 library(DT)
+library(waiter)
 
 # extract declared forms from config.yml
 parse_forms <- function(l) {
@@ -37,3 +38,9 @@ est_hive_conn <- function(g, l) {
         Schema   = l[["db_name"]]
     )
 }
+
+# customize loading screen
+waiting_screen <- tagList(
+    spin_dual_circle(),
+    h4("请稍等片刻，拉比克正在为大人您服务 ٩(◕‿◕｡)۶ ")
+) 

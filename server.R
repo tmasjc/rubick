@@ -3,12 +3,15 @@ server <- function(input, output, session) {
     # read global setting here
     globe <- config::get()
     
+    # create loading screen obj
+    w <- Waiter$new(html = waiting_screen, color = "black")
+    
     # update forms 
     forms <- parse_forms(globe)
     updateSelectizeInput(session, "form", choices = forms, selected = "")
     
     # when user selects, read SQL file accordingly
-    loc   <- reactive({
+    loc <- reactive({
         req(input$form)
         config::get(config = tolower(input$form))
     })
@@ -27,7 +30,7 @@ server <- function(input, output, session) {
     })
     
     # extract variables here
-    vars  <- reactive({
+    vars <- reactive({
         
         query() %>%
             str_extract_all("\\?\\w+", simplify = TRUE) %>%
@@ -68,9 +71,12 @@ server <- function(input, output, session) {
         query()
     })
     
+    # this is our core function
     res <- eventReactive(input$run, {
         
         message("Ready to establish connection.")
+        
+        w$show()
         
         # which type of connection?
         if (loc()['type'] == "mysql") {
@@ -80,6 +86,7 @@ server <- function(input, output, session) {
             conn <- est_hive_conn(globe, loc())
             
         } else {
+            w$hide()
             stop("Check type declaration.")
         }
         
@@ -88,14 +95,23 @@ server <- function(input, output, session) {
         
         # evaluate interpolation 
         # let error displayed to output
-        q     <- eval(parse_expr(meta()))
+        q <- eval(parse_expr(meta()))
         message("Query: ", q)
         
         # fetch data
-        res   <- DBI::dbGetQuery(conn, q)
+        tryCatch(
+            res <- DBI::dbGetQuery(conn, q),
+            error = function(e) {
+                DBI::dbDisconnect(conn)
+                w$hide()
+                return("Failed to fetch data.")
+            }
+        )
         
         DBI::dbDisconnect(conn)
         message("Close connection.")
+        
+        w$hide()
         
         return(res)
         

@@ -4,6 +4,8 @@ ui <- fluidPage(
         tags$link(rel = "stylesheet", type = "text/css", href = "custom.css")
     ),
     
+    use_waiter(), # loading screen dependencies
+    
     titlePanel("R U B I C K"),
     tags$hr(),
     theme = shinytheme("yeti"),
@@ -17,6 +19,7 @@ ui <- fluidPage(
                 width   = "100%"
             ),
             uiOutput("variables"),
+            textInput("token", "Token", width = "60%"),
             actionButton(
                 inputId = "run",
                 label   = "Run",
