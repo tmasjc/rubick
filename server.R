@@ -1,77 +1,3 @@
-library(tidyverse)
-library(shiny)
-library(shinythemes)
-library(DBI)
-library(dbplyr)
-library(config)
-library(rlang)
-library(DT)
-
-ui <- fluidPage(
-    
-    tags$head(
-        tags$link(rel = "stylesheet", type = "text/css", href = "custom.css")
-    ),
-    
-    titlePanel("R U B I C K"),
-    tags$hr(),
-    theme = shinytheme("yeti"),
-    
-    sidebarLayout(
-        sidebarPanel(
-            selectizeInput(
-                inputId = "form",
-                label   = tags$h4("可选项"),
-                choices = "",
-                width   = "100%"
-            ),
-            uiOutput("variables"),
-            actionButton(
-                inputId = "run",
-                label   = "Run",
-                icon    = icon("circle-notch"),
-                width   = "100%"
-            ), 
-            width = 3
-        ),
-        mainPanel(
-            tags$h4("Query"),
-            verbatimTextOutput("print_query"),
-            tags$h4("Result"),
-            dataTableOutput("tbl"), 
-            width = 8
-        ), 
-        position = "right"
-    )
-)
-
-# extract declared forms from config.yml
-parse_forms <- function(l) {
-    ind <- which(stringr::str_detect(names(l), "^form"))
-    unlist(l[ind], use.names = FALSE)
-}
-
-# locate appropriate driver
-driver <- function(drv) {
-    x <- tolower(drv)
-    if (x == "mysql") {
-        return(RMySQL::MySQL())
-    }
-}
-
-est_conn <- function(g, l) {
-    
-    # g for global, x for local
-    DBI::dbConnect(
-        user     = g[["username"]],
-        password = g[["password"]],
-        host     = l[["db_host"]],
-        port     = l[["db_port"]],
-        dbname   = l[["db_name"]],
-        drv      = driver(l[["drv"]])
-    )
-}
-
 server <- function(input, output, session) {
     
     # read global setting here
@@ -146,37 +72,48 @@ server <- function(input, output, session) {
         
         message("Ready to establish connection.")
         
-        conn  <- est_conn(globe, loc())
+        # which type of connection?
+        if (loc()['type'] == "mysql") {
+            conn <- est_mysql_conn(globe, loc())
+            
+        } else if (loc()['type'] == "hive") {
+            conn <- est_hive_conn(globe, loc())
+            
+        } else {
+            stop("Check type declaration.")
+        }
         
         # 'query' the variable name is fixed!
         query <- query()
         
         # evaluate interpolation 
+        # let error displayed to output
         q     <- eval(parse_expr(meta()))
+        message("Query: ", q)
         
         # fetch data
         res   <- DBI::dbGetQuery(conn, q)
         
         DBI::dbDisconnect(conn)
         message("Close connection.")
+        
         return(res)
         
     })
     
     output$tbl <- renderDataTable({
         
-        req(meta())
+        req(res())
         
         datatable(
-            head(res(), 20),
-            options   = list(dom = 'tip'), 
-            class     = 'cell-border stripe',
-            rownames  = FALSE
+            data          = head(res(), 20),
+            options       = list(dom = 'tip'), 
+            class         = 'cell-border stripe',
+            fillContainer = TRUE,
+            rownames      = FALSE
         )
         
     })
     
     
 }
-
-shinyApp(ui, server)
