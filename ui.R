@@ -1,3 +1,6 @@
+# read global setting here
+globe <- config::get()
+
 ui <- fluidPage(
     
     tags$head(
@@ -6,7 +9,8 @@ ui <- fluidPage(
     
     use_waiter(), # loading screen dependencies
     
-    titlePanel("R U B I C K"),
+    titlePanel(globe$title),
+    tags$h4(globe$zh_title),
     tags$hr(),
     theme = shinytheme("yeti"),
     
@@ -14,12 +18,12 @@ ui <- fluidPage(
         sidebarPanel(
             selectizeInput(
                 inputId = "form",
-                label   = tags$h4("可选项"),
+                label   = tags$h4("Options 可选项"),
                 choices = "",
                 width   = "100%"
             ),
             uiOutput("variables"),
-            textInput("token", "Token", width = "60%"),
+            textInput("token", "Token 秘钥", width = "60%"),
             actionButton(
                 inputId = "run",
                 label   = "Run",
@@ -29,9 +33,9 @@ ui <- fluidPage(
             width = 3
         ),
         mainPanel(
-            tags$h4("Result"),
+            tags$h5("Preview 结果预览"),
             column(12, dataTableOutput("tbl", height = "480px")), 
-            tags$h4("Query"),
+            tags$h5("Query 查询语句"),
             verbatimTextOutput("print_query"),
             width = 8
         ), 

@@ -1,4 +1,6 @@
 default:
+    title: "Ruḅick"
+    zh_title: "拉比克"
     database: database.yml
     source: SRC
     # declare forms below
