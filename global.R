@@ -8,6 +8,7 @@ library(config)
 library(rlang)
 library(DT)
 library(waiter)
+options(shiny.sanitize.errors = FALSE)
 
 # extract declared forms from config.yml
 parse_forms <- function(l) {

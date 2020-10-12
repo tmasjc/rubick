@@ -13,5 +13,5 @@ body {
 }
 
 #download.shiny-output-error {
-    font-size: 0em;
+    display: none;
 }
