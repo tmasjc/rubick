@@ -74,6 +74,11 @@ server <- function(input, output, session) {
     # this is our core function
     res <- eventReactive(input$run, {
         
+        req(input$token)
+        
+        # check if token matches
+        validate_token(input$token, loc()[['token']])
+        
         message("Ready to establish connection.")
         
         w$show()

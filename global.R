@@ -43,3 +43,9 @@ waiting_screen <- tagList(
     spin_dual_circle(),
     h4("请稍等片刻，拉比克正在为大人您服务 ٩(◕‿◕｡)۶ ")
 ) 
+
+validate_token <- function(x, y) {
+    if (x != y) {
+        stop("Validation failed. Check token.")
+    }
+}
