@@ -10,7 +10,7 @@ ui <- fluidPage(
     use_waiter(), # loading screen dependencies
     
     titlePanel(globe$title),
-    tags$h4(globe$zh_title),
+    tags$h4(globe$subtitle),
     tags$hr(),
     theme = shinytheme("yeti"),
     
