@@ -38,8 +38,8 @@ ui <- fluidPage(
         mainPanel(
             tags$h5("Preview 结果预览"),
             column(12, dataTableOutput("tbl", height = "480px")), 
-            tags$h5("Query 查询语句"),
-            verbatimTextOutput("print_query"),
+            # tags$h5("Query 查询语句"),
+            # verbatimTextOutput("print_query"),
             width = 8
         ), 
         position = "right"
