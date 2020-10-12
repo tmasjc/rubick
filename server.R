@@ -58,6 +58,15 @@ server <- function(input, output, session) {
         
     })
     
+    output$description <- renderUI({
+        
+        req(input$form)
+        
+        tagList(
+            tags$p(loc()[['description']])
+        )
+    })
+    
     # use metaprogramming to render UI
     output$variables <- renderUI({
     

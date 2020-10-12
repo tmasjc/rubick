@@ -22,6 +22,7 @@ ui <- fluidPage(
                 choices = "",
                 width   = "100%"
             ),
+            uiOutput("description"),
             uiOutput("variables"),
             textInput("token", "Token 秘钥", width = "60%"),
             actionButton(

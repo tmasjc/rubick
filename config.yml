@@ -13,15 +13,16 @@ apple:
     file: a.sql
     origin: dev
     token: abcde
-    description: "this works!"
+    description: "Minimal example."
 
 banana:
     file: b.sql
-    description: "will not work."
-
+    origin: 
+    description: "Origin not set. Will not work."
+    
 guava:
     file: hive.sql
     origin: dbw
     token: abcde
-    description: "for Hive warehouse.."
+    description: "Hive connection demo."
 
