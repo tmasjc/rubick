@@ -20,7 +20,7 @@ server <- function(input, output, session) {
     query <- reactive({
         
         tryCatch(
-            read_file(str_glue("{ globe$src }/{ loc()$file }")),
+            read_file(str_glue("{ globe$source }/{ loc()$file }")),
             # in case file not found
             error = function(e) {
                 return("")
@@ -79,16 +79,22 @@ server <- function(input, output, session) {
         w$show()
         
         # which type of connection?
-        if (loc()['type'] == "mysql") {
-            conn <- est_mysql_conn(globe, loc())
+        db <- config::get(
+            config = loc()[['origin']], 
+            file   = globe$database
+        )
+        
+        if (db['type'] == "mysql") {
+            conn <- est_mysql_conn(db)
             
-        } else if (loc()['type'] == "hive") {
-            conn <- est_hive_conn(globe, loc())
+        } else if (db['type'] == "hive") {
+            conn <- est_hive_conn(db)
             
         } else {
             w$hide()
             stop("Check type declaration.")
         }
+        message(DBI::dbGetInfo(conn))
         
         # 'query' the variable name is fixed!
         query <- query()

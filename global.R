@@ -15,27 +15,26 @@ parse_forms <- function(l) {
     unlist(l[ind], use.names = FALSE)
 }
 
-# g for global, x for local
-est_mysql_conn <- function(g, l) {
+# establish to specified connection
+est_mysql_conn <- function(db) {
     DBI::dbConnect(
-        drv      = g[["mysql_drv"]],
-        user     = g[["mysql_user"]],
-        password = g[["mysql_pwd"]],
-        host     = l[["db_host"]],
-        port     = l[["db_port"]],
-        dbname   = l[["db_name"]],
+        drv      = db[["driver"]],
+        host     = db[["host"]],
+        port     = db[["port"]],
+        user     = db[["username"]],
+        password = db[["password"]],
+        dbname   = db[["dbname"]]
     )
 }
 
-est_hive_conn <- function(g, l) {
+est_hive_conn <- function(db) {
     DBI::dbConnect(
         odbc::odbc(),
-        Driver   = g[['hive_drv']],
-        UID      = g[["hive_user"]],
-        PWD      = g[["hive_pwd"]],
-        Host     = l[["db_host"]],
-        Port     = l[["db_port"]],
-        Schema   = l[["db_name"]]
+        Driver   = db[['driver']],
+        Host     = db[["host"]],
+        Port     = db[["port"]],
+        UID      = db[["username"]],
+        PWD      = db[["passwors"]]
     )
 }
 

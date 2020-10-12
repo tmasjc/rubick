@@ -1,0 +1,25 @@
+default:
+    database: database.yml
+    source: SRC
+    # declare forms below
+    form1: apple
+    form2: banana
+    form3: coconut # missing on purpose
+    form4: guava
+        
+apple:
+    file: a.sql
+    origin: dev
+    token: abcde
+    description: "this works!"
+
+banana:
+    file: b.sql
+    description: "will not work."
+
+guava:
+    file: hive.sql
+    origin: dbw
+    token: abcde
+    description: "for Hive warehouse.."
+
