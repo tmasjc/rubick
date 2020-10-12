@@ -24,5 +24,4 @@ where dt = date_format(date_sub(current_date(), 1), "yyyyMMdd")
     and amount <= 990 
     and new_budget_group_name in ('C组','转介绍组','市场组','分销组')
     and class_id != 0 
-    and class_id is not null
-limit 20;
+    and class_id is not null;

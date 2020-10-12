@@ -30,7 +30,9 @@ ui <- fluidPage(
                 label   = "Run",
                 icon    = icon("circle-notch"),
                 width   = "100%"
-            ), 
+            ),
+            tags$hr(),
+            uiOutput("download"),
             width = 3
         ),
         mainPanel(
