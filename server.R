@@ -32,6 +32,8 @@ server <- function(input, output, session) {
     # extract variables here
     vars <- reactive({
         
+        req(input$form)
+        
         query() %>%
             str_extract_all("\\?\\w+", simplify = TRUE) %>%
             map_chr(~ str_remove(., "\\?"))
@@ -68,6 +70,13 @@ server <- function(input, output, session) {
     
     # preview meta query
     output$print_query <- renderText({
+        
+        req(input$form)
+        
+        if (query() == "") {
+            stop("File not found. Check config.")
+        }
+        
         query()
     })
     
@@ -97,7 +106,7 @@ server <- function(input, output, session) {
             
         } else {
             w$hide()
-            stop("Check type declaration.")
+            stop("Database type not found. Check config.")
         }
         message(DBI::dbGetInfo(conn))
         
@@ -106,8 +115,14 @@ server <- function(input, output, session) {
         
         # evaluate interpolation 
         # let error displayed to output
-        q <- eval(parse_expr(meta()))
-        message("Query: ", q)
+        tryCatch(
+            q <- eval(parse_expr(meta())),
+            error = function(e) {
+                DBI::dbDisconnect(conn)
+                w$hide()
+                stop("Failed to parse query. Check arguments.")
+            }
+        )
         
         # fetch data
         tryCatch(
@@ -115,7 +130,7 @@ server <- function(input, output, session) {
             error = function(e) {
                 DBI::dbDisconnect(conn)
                 w$hide()
-                return("Failed to fetch data.")
+                stop("Failed to fetch data.")
             }
         )
         
