@@ -44,8 +44,9 @@ waiting_screen <- tagList(
     h4("请稍等片刻，拉比克正在为大人您服务 ٩(◕‿◕｡)۶ ")
 ) 
 
-validate_token <- function(x, y) {
-    if (x != y) {
+validate_token <- function(input, ref) {
+    
+    if (input != ref) {
         stop("Validation failed. Check token.")
     }
 }

@@ -83,16 +83,21 @@ server <- function(input, output, session) {
     # this is our core function
     res <- eventReactive(input$run, {
         
-        req(input$token)
+        req(input$form)
         
         # check if token matches
-        validate_token(input$token, loc()[['token']])
-        
+        if (!is.null(loc()[['token']])) {
+            validate_token(input$token, loc()[['token']])
+        }
         message("Ready to establish connection.")
         
         w$show()
         
         # which type of connection?
+        if (is.null(loc()[['origin']])) {
+            w$hide()
+            stop("Origin not set. Check config.")
+        }
         db <- config::get(
             config = loc()[['origin']], 
             file   = globe$database
