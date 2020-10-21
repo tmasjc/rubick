@@ -32,7 +32,7 @@ ui <- fluidPage(
                 width   = "100%"
             ),
             tags$hr(),
-            uiOutput("download"),
+            downloadLink("downloadRes", label = "点击下载数据"),
             width = 3
         ),
         mainPanel(

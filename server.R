@@ -171,17 +171,12 @@ server <- function(input, output, session) {
         
     })
     
-    output$download <- renderUI({
-        req(res())
-        tags$strong(downloadLink("downloadRes", "点击这里下载"))
-    })
-    
     output$downloadRes <- downloadHandler(
         filename = function() {
             paste(input$form, "-", Sys.Date(), ".csv", sep = "")
         },
         content <- function(f) {
-            write_csv(res(), f)
+            write_excel_csv(res(), f)
         }
     )
     
