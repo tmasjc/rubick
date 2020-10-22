@@ -8,6 +8,7 @@ server <- function(input, output, session) {
     
     # update forms 
     forms <- parse_forms(globe)
+    names(forms) <- map_chr(forms, ~ get_form_name(.x))
     updateSelectizeInput(session, "form", choices = forms, selected = "")
     
     # when user selects, read SQL file accordingly

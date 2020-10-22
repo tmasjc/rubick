@@ -51,3 +51,14 @@ validate_token <- function(input, ref) {
         stop("Validation failed. Check token.")
     }
 }
+
+get_form_name <- function(form) {
+    
+    name <- config::get(config = form)[['name']]
+    
+    if (is.null(name)) {
+        return(form)
+    }
+    
+    return(name)
+}
