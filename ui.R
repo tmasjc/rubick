@@ -42,6 +42,6 @@ ui <- fluidPage(
             # verbatimTextOutput("print_query"),
             width = 8
         ), 
-        position = "right"
+        position = "left"
     )
 )

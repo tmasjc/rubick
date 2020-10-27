@@ -4,6 +4,7 @@ library(shinythemes)
 library(DBI)
 library(odbc)
 library(dbplyr)
+library(yaml)
 library(config)
 library(rlang)
 library(DT)
@@ -11,9 +12,9 @@ library(waiter)
 options(shiny.sanitize.errors = FALSE)
 
 # extract declared forms from config.yml
-parse_forms <- function(l) {
-    ind <- which(stringr::str_detect(names(l), "^form"))
-    unlist(l[ind], use.names = FALSE)
+parse_forms <- function(f) {
+    forms <- yaml::read_yaml(file = f)
+    names(forms)[-1]
 }
 
 # establish to specified connection
@@ -40,10 +41,11 @@ est_hive_conn <- function(db) {
 }
 
 # customize loading screen
-waiting_screen <- tagList(
-    spin_dual_circle(),
-    h4("请稍等片刻，拉比克正在为大人您服务 ٩(◕‿◕｡)۶ ")
-) 
+waiting_screen <- 
+    tagList(
+        spin_dual_circle(),
+        h4("请稍等片刻，拉比克正在为大人您服务 ٩(◕‿◕｡)۶ ")
+    )
 
 validate_token <- function(input, ref) {
     

@@ -7,7 +7,7 @@ server <- function(input, output, session) {
     w <- Waiter$new(html = waiting_screen, color = "black")
     
     # update forms 
-    forms <- parse_forms(globe)
+    forms <- parse_forms(globe$config)
     names(forms) <- map_chr(forms, ~ get_form_name(.x))
     updateSelectizeInput(session, "form", choices = forms, selected = "")
     
