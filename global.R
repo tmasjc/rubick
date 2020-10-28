@@ -64,3 +64,14 @@ get_form_name <- function(form) {
     
     return(name)
 }
+
+get_form_group <- function(form) {
+    
+    grp <- config::get(config = form)[['group']]
+    
+    if (is.null(grp)) {
+        return("blank")
+    }
+    
+    return(grp)
+}

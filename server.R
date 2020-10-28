@@ -9,7 +9,14 @@ server <- function(input, output, session) {
     # update forms 
     forms <- parse_forms(globe$config)
     names(forms) <- map_chr(forms, ~ get_form_name(.x))
-    updateSelectizeInput(session, "form", choices = forms, selected = "")
+    
+    # assign group to form
+    grps <- map_chr(forms, ~ get_form_group(.x))
+    form_choices <- map(unique(grps), ~ forms[which(grps == .x)])
+    names(form_choices) <- unique(grps)
+    
+    # populate form selection
+    updateSelectizeInput(session, "form", choices = form_choices, selected = "")
     
     # when user selects, read SQL file accordingly
     loc <- reactive({
