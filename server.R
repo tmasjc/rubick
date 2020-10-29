@@ -76,7 +76,8 @@ server <- function(input, output, session) {
         req(input$form)
         
         tagList(
-            tags$p(loc()[['description']])
+            tags$small(id = "desc", paste0("::", loc()[['description']])),
+            tags$p("")
         )
     })
     

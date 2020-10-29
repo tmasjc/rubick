@@ -30,7 +30,7 @@ ui <- fluidPage(
                 left = 20,
                 right = "auto",
                 bottom = "auto",
-                width = 330,
+                width = 350,
                 height = "auto",
                 selectizeInput(
                     inputId = "form",
