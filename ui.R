@@ -14,8 +14,20 @@ ui <- fluidPage(
     tags$hr(),
     theme = shinytheme("yeti"),
     
-    sidebarLayout(
-        sidebarPanel(
+    fluidPage(
+        tags$h5(id = "preview_title", "Preview 结果预览"),
+        column(12, dataTableOutput("tbl", height = "640px")),
+        absolutePanel(
+            id = "controls",
+            class = "well",
+            fixed = TRUE,
+            draggable = TRUE,
+            top = 200,
+            left = 20,
+            right = "auto",
+            bottom = "auto",
+            width = 330,
+            height = "auto", 
             selectizeInput(
                 inputId = "form",
                 label   = tags$h4("Options 可选项"),
@@ -33,15 +45,7 @@ ui <- fluidPage(
             ),
             tags$hr(),
             downloadLink("downloadRes", label = "点击下载数据"),
-            width = 3
-        ),
-        mainPanel(
-            tags$h5("Preview 结果预览"),
-            column(12, dataTableOutput("tbl", height = "640px")), 
-            # tags$h5("Query 查询语句"),
-            # verbatimTextOutput("print_query"),
-            width = 8
-        ), 
-        position = "left"
+        )
+        
     )
 )

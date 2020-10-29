@@ -2,8 +2,12 @@ body {
     background-color: #fff;
 }
 
-.well {
+#controls {
     box-shadow: 0px 2px 10px 1px;
+}
+
+#preview_title {
+    float: right;
 }
 
 .shiny-output-error {
