@@ -18,6 +18,10 @@ server <- function(input, output, session) {
     # populate form selection
     updateSelectizeInput(session, "form", choices = form_choices, selected = "")
     
+    observeEvent(input$ctrl, {
+        toggle(id = 'controls')
+    })
+    
     # when user selects, read SQL file accordingly
     loc <- reactive({
         req(input$form)
