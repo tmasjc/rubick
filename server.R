@@ -59,9 +59,10 @@ server <- function(input, output, session) {
         
         # collpase 'abc = input$abc'
         v <- vars() %>% 
-            map2(inputs, ~ str_glue("{.x} = {.y}")) %>% 
+            map2(inputs, ~ str_glue("{.x} = SQL({.y})")) %>% 
             paste(collapse = ", ")
         
+        #message(str_glue("sqlInterpolate(conn, query, {v})"))
         str_glue("sqlInterpolate(conn, query, {v})")
         
     })
