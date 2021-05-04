@@ -63,7 +63,7 @@ server <- function(input, output, session) {
             paste(collapse = ", ")
         
         #message(str_glue("sqlInterpolate(conn, query, {v})"))
-        str_glue("sqlInterpolate(conn, query, {v})")
+        str_glue("sqlInterpolate(ANSI(), query, {v})")
         
     })
     
@@ -110,29 +110,14 @@ server <- function(input, output, session) {
         }
         message("Ready to establish connection.")
         
-        w$show()
-        
         # which type of connection?
         if (is.null(loc()[['origin']])) {
-            w$hide()
             stop("Origin not set. Check config.")
         }
         db <- config::get(
             config = loc()[['origin']], 
             file   = globe$database
         )
-        
-        if (db['type'] == "mysql") {
-            conn <- est_mysql_conn(db)
-            
-        } else if (db['type'] == "hive") {
-            conn <- est_hive_conn(db)
-            
-        } else {
-            w$hide()
-            stop("Database type not found. Check config.")
-        }
-        message(DBI::dbGetInfo(conn, "host"))
         
         # 'query' the variable name is fixed!
         query <- query()
@@ -143,42 +128,57 @@ server <- function(input, output, session) {
             q <- eval(parse_expr(meta())),
             error = function(e) {
                 DBI::dbDisconnect(conn)
-                w$hide()
                 stop("Failed to parse query. Check arguments.")
             }
         )
         message(q)
+        w$show()
         
-        # fetch data
-        tryCatch(
-            res <- DBI::dbGetQuery(conn, q),
-            error = function(e) {
+        # fetch data in a separate process
+        future(
+            {
+                if (db['type'] == "mysql") {
+                    conn <- est_mysql_conn(db)
+                } else if (db['type'] == "hive") {
+                    conn <- est_hive_conn(db)
+                } else {
+                    stop("Database type not found.")
+                }
+                message(DBI::dbGetInfo(conn, "host"))
+                dat <- DBI::dbGetQuery(conn, q)
                 DBI::dbDisconnect(conn)
+                message("Close connection.")
+                
+                # return
+                dat
+            }
+        ) %...>% (
+            # expect a data frame here
+            function(result) {
                 w$hide()
-                stop("Failed to fetch data. Check query.")
+                return(result)
+            }
+        ) %...!% (
+            # error could come from `conn` or `res`
+            function(error) {
+                w$hide()
+                stop(error)
             }
         )
-        
-        DBI::dbDisconnect(conn)
-        message("Close connection.")
-        
-        w$hide()
-        
-        return(res)
         
     })
     
     output$tbl <- renderDataTable({
         
-        req(res())
-        
-        datatable(
-            data          = sample_n(res(), 20, replace = TRUE),
-            options       = list(dom = 'tip'), 
-            class         = 'cell-border stripe',
-            fillContainer = TRUE,
-            rownames      = FALSE
-        )
+        res() %...>% {
+            datatable(
+                data          = sample_n(., 20, replace = TRUE),
+                options       = list(dom = 'tip'),
+                class         = 'cell-border stripe',
+                fillContainer = TRUE,
+                rownames      = FALSE
+            )
+        }
         
     })
     

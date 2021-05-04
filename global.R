@@ -9,7 +9,11 @@ library(config)
 library(rlang)
 library(DT)
 library(waiter)
+library(future)
+library(promises)
 options(shiny.sanitize.errors = FALSE)
+options(future.rng.onMisuse = 'ignore')
+plan(multisession, workers = 2)
 
 # extract declared forms from config.yml
 parse_forms <- function(f) {
@@ -20,7 +24,7 @@ parse_forms <- function(f) {
 # establish to specified connection
 est_mysql_conn <- function(db) {
     DBI::dbConnect(
-        drv      = db[["driver"]],
+        drv      = RMySQL::MySQL(),
         host     = db[["host"]],
         port     = db[["port"]],
         user     = db[["username"]],
