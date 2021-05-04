@@ -9,8 +9,6 @@ library(config)
 library(rlang)
 library(DT)
 library(waiter)
-library(shinyWidgets)
-library(shinyjs)
 options(shiny.sanitize.errors = FALSE)
 
 # extract declared forms from config.yml

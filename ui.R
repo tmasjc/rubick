@@ -15,23 +15,11 @@ ui <- fluidPage(
     theme = shinytheme("yeti"),
     
     fluidPage(
-        useShinyjs(),
-        materialSwitch(inputId = "ctrl",
-                       label = tags$small("隐藏控制板"),
-                       status = "info"), 
-        column(12, dataTableOutput("tbl", height = "640px")),
-        hidden(
-            absolutePanel(
+        sidebarLayout(
+            sidebarPanel(
                 id = "controls",
                 class = "well",
-                fixed = TRUE,
-                draggable = TRUE,
-                top = 200,
                 left = 20,
-                right = "auto",
-                bottom = "auto",
-                width = 350,
-                height = "auto",
                 selectizeInput(
                     inputId = "form",
                     label   = tags$h4("Options 可选项"),
@@ -48,11 +36,14 @@ ui <- fluidPage(
                     width   = "100%"
                 ),
                 tags$hr(),
-                tags$small("注: 只显示部分结果, 全量数据请点击下载."),
+                tags$small("为了优化计算性能，右侧只会显示部分结果。"),
                 tags$br(), tags$br(),
-                downloadLink("downloadRes", label = tags$strong("下载数据", icon("download")))
+                downloadLink("downloadRes", label = tags$strong("点击下载全量数据", icon("download")))
+            ),
+            mainPanel(
+                column(12, dataTableOutput("tbl", height = "640px"))
             )
+            
         )
-        
     )
 )

@@ -18,10 +18,6 @@ server <- function(input, output, session) {
     # populate form selection
     updateSelectizeInput(session, "form", choices = form_choices, selected = "")
     
-    observeEvent(input$ctrl, {
-        toggle(id = 'controls')
-    })
-    
     # when user selects, read SQL file accordingly
     loc <- reactive({
         req(input$form)
@@ -136,7 +132,7 @@ server <- function(input, output, session) {
             w$hide()
             stop("Database type not found. Check config.")
         }
-        message(DBI::dbGetInfo(conn))
+        message(DBI::dbGetInfo(conn, "host"))
         
         # 'query' the variable name is fixed!
         query <- query()
@@ -151,6 +147,7 @@ server <- function(input, output, session) {
                 stop("Failed to parse query. Check arguments.")
             }
         )
+        message(q)
         
         # fetch data
         tryCatch(
@@ -158,7 +155,7 @@ server <- function(input, output, session) {
             error = function(e) {
                 DBI::dbDisconnect(conn)
                 w$hide()
-                stop("Failed to fetch data.")
+                stop("Failed to fetch data. Check query.")
             }
         )
         
@@ -176,7 +173,7 @@ server <- function(input, output, session) {
         req(res())
         
         datatable(
-            data          = head(res(), 20),
+            data          = sample_n(res(), 20, replace = TRUE),
             options       = list(dom = 'tip'), 
             class         = 'cell-border stripe',
             fillContainer = TRUE,
