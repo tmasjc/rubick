@@ -16,12 +16,6 @@ options(future.rng.onMisuse = 'ignore')
 plan(multisession, workers = 2)
 enableBookmarking(store = "url")
 
-# extract declared forms from config.yml
-parse_forms <- function(f) {
-    forms <- yaml::read_yaml(file = f)
-    names(forms)[-1]
-}
-
 # establish to specified connection
 est_mysql_conn <- function(db) {
     DBI::dbConnect(

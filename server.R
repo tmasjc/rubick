@@ -7,7 +7,8 @@
     w <- Waiter$new(html = waiting_screen, color = "black")
     
     # update forms 
-    forms <- parse_forms(globe$config)
+    forms <- yaml::read_yaml(file = "config.yml")
+    forms <- names(forms)[-1]
     names(forms) <- map_chr(forms, ~ get_form_name(.x))
     
     # assign group to form
@@ -77,7 +78,6 @@
             map2(inputs, ~ str_glue("{.x} = SQL({.y})")) %>% 
             paste(collapse = ", ")
         
-        #message(str_glue("sqlInterpolate(conn, query, {v})"))
         str_glue("sqlInterpolate(ANSI(), query, {v})")
         
     })
@@ -131,7 +131,7 @@
         }
         db <- config::get(
             config = loc()[['origin']], 
-            file   = globe$database
+            file   = 'database.yml'
         )
         
         # 'query' the variable name is fixed!
@@ -146,7 +146,7 @@
                 stop("Failed to parse query. Check arguments.")
             }
         )
-        message(q)
+        # message(q)
         w$show()
         
         # fetch data in a separate process
