@@ -5,3 +5,4 @@
 database.yml
 config.yml
 SRC
+.DS_Store

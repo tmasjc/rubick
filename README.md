@@ -1,60 +1,69 @@
 # Rubick 
 
-### Background
+## Background
 
-Simple SQL automation tool, built on Shiny framework, written in R. 
+A web interface that enables analyst to parameterize database query into web form. The main purpose is to allow end user access to database query without giving out database credential. Also prevents database injection.
 
-1. it allows analyst to transform database query with variables into web form;
-2. it prevents database injection; 
+## Requirements 
 
-### Getting Started 
+For Rubick to work, it requires 2 YAML files.
 
-For Rubick to work, it requires 2 files, *database.yml* and *config.yml*. 
+- `database.yml` tells Rubick about your database connections
 
-Form registration takes 2 steps, first you must declare a key contains the string 'form', (form1, form2, etc.) under **default**. Then under each form (key), provide the sub-keys required. 
+- `config.yml` declares your SQL queries
+
+## Setup Database Connections
+
+Assume that we have a MySQL database called '**mart**' and Hive data warehouse called '**dbw**', this is how we setup the connections. 
+
+Note that Rubick by default supports `MySQL`, thus we do not need to specify MySQL driver.
+
+```yaml
+default:
+    master: NULL # not use
+
+mart:
+    type: mysql
+    host: your-database
+    port: some-port
+    username: some-user
+    password: some-password
+    dbname: some-database
+
+dbw:
+    type: hive
+    driver: /opt/mapr/hiveodbc/lib/universal/libmaprhiveodbc.dylib
+    host: your-data-warehouse
+    port: some-port
+    username: some-user
+    password: some-password
+```
+
+## Declare SQL Queries
+
+For every query we declare, it needs to have 3 things: a name (the root node), a `file`, and an `origin`. 
+
+Name must be unique so that we can identify them in web form selections. `file` links to the actual SQL query which we will execute. `origin` refers to some specific database connection which we declare in `database.yml`.
+
+All SQL scripts must be put in a common folder. Specified under `source` key.
 
 ```yaml
 default:
     title: "Rubick"
     subtitle: "拉比克"
-    database: database.yml # database configuration
-    source: Scripts # which folder SQL scripts will be stored
-    form1: apple # declare form here
+    source: Scripts # where folder SQL scripts will be stored
     
-apple:
-    file: a.sql # which file
-    origin: dev1  # which database config
-    token: abcde # secret (optional)
-    description: "Minimal example." # description (optional)
-```
+queryA:
+    file: a.sql 
+    origin: mart
+    token:  # secret (optional)
+    description: "example" # also optional
 
-*database.yml* is meant for database configuration. It is merely a connection setup for R. For more information, please refer to https://db.rstudio.com/databases.
-
-```yaml
-default:
-    master: NULL
-
-dev1:
-    type: hive
-    driver: /opt/mapr/hiveodbc/lib/universal/libmaprhiveodbc.dylib
-    host: 127.0.0.1
-    port: 10000
-    username: some-user
-    password: some-password
-    dbname: some-database
-```
-
-You can also make use of R database packages by including `!!expr`. It translates string into R code.
-
-```yaml
-dev2:
-    type: mysql
-    driver: !!expr RMySQL::MySQL()
-    host: 127.0.0.1
-    port: 3306
-    username: some-user
-    password: some-password
-    dbname: some-database
+queryB:
+    file: b.sql 
+    origin: dbw 
+    token: 12345678 
+    description: "another example"
 ```
 
 
