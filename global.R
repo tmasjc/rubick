@@ -14,6 +14,7 @@ library(promises)
 options(shiny.sanitize.errors = FALSE)
 options(future.rng.onMisuse = 'ignore')
 plan(multisession, workers = 2)
+enableBookmarking(store = "url")
 
 # extract declared forms from config.yml
 parse_forms <- function(f) {
@@ -79,3 +80,5 @@ get_form_group <- function(form) {
     
     return(grp)
 }
+
+

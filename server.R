@@ -1,4 +1,4 @@
-server <- function(input, output, session) {
+ function(input, output, session) {
     
     # read global setting here
     globe <- config::get()
@@ -17,6 +17,20 @@ server <- function(input, output, session) {
     
     # populate form selection
     updateSelectizeInput(session, "form", choices = form_choices, selected = "")
+    
+    # bookmarking via url
+    observe({
+        reactiveValuesToList(input)
+        session$doBookmark()
+    })
+    onBookmarked(updateQueryString)
+    onBookmark(function(state) {
+        state$values$form <- input$form
+    })
+    onRestore(function(state) {
+        updateSelectizeInput(session, "form", choices = form_choices, selected = state$values$form)
+    })
+    setBookmarkExclude("token")
     
     # when user selects, read SQL file accordingly
     loc <- reactive({
