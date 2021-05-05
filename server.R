@@ -44,7 +44,8 @@ server <- function(input, output, session) {
         
         query() %>%
             str_extract_all("\\?\\w+", simplify = TRUE) %>%
-            map_chr(~ str_remove(., "\\?"))
+            map_chr(~ str_remove(., "\\?")) %>% 
+            unique()
         
     })
     
