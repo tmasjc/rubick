@@ -38,7 +38,13 @@ function(request) {
                         width   = "100%"
                     ),
                     tags$hr(),
-                    tags$small("为了优化计算性能，右侧只会显示部分结果。"),
+                    # putting remarks here 
+                    tags$h5("注"),
+                    tags$small("1. 为了优化计算性能，右侧只会显示部分结果；"),
+                    tags$br(),
+                    tags$small("2. 部分结果来自随机抽取；"),
+                    tags$br(),
+                    tags$small("3. 你可以通过网页链接保存查询参数；"),
                     tags$br(), tags$br(),
                     downloadLink("downloadRes", label = tags$strong("点击下载全量数据", icon("download")))
                 ),
