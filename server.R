@@ -202,9 +202,10 @@
             paste(input$form, "-", Sys.Date(), ".csv", sep = "")
         },
         content <- function(f) {
-            write_excel_csv(res(), f)
+            res() %...>% {
+                write_excel_csv(., f)
+            }
         }
     )
-    
     
 }
